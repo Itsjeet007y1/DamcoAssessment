@@ -26,8 +26,8 @@ public class UserService implements IUserService {
 
 	@Override
 	public String deleteUser(String id) {
-		userRepository.deleteById(id);
-		return "User with id: " + id + " deleted successfully.";
+		int userId = userRepository.deleteByUserId(id);
+		return "User with id: " + userId + " deleted successfully.";
 	}
 
 }

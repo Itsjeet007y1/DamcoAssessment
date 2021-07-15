@@ -2,17 +2,33 @@ package com.example.demo.model;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Document("user")
 public class User {
 	
 	@Id
+	@NotNull
+	@NotEmpty
+	@NotBlank
 	private String userId;
+	
+	@NotNull
+	@NotEmpty
 	private String firstName;
+	@NotNull
+	@NotEmpty
 	private String sirName;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date dob;
+	@NotNull
+	@NotEmpty
 	private String title;
 	
 	public User(String userId, String firstName, String sirName, Date dob, String title) {

@@ -7,5 +7,5 @@ import com.example.demo.model.User;
 
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
-
+	public int deleteByUserId(String userId);
 }

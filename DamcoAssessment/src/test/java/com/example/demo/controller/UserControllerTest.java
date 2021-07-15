@@ -11,17 +11,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import com.example.demo.model.ResponseDefObject;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
+import com.example.demo.utility.Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest
@@ -38,11 +43,13 @@ public class UserControllerTest {
 
 	@MockBean
 	private UserRepository userRepository;
+
 	
 	@Test
 	public void testGetUsers() throws Exception {
 		
 		List<User> listUser = new ArrayList<>();
+		
 		
 		listUser.add(new User("1", "Jitendra", "Kumar", new Date(), "Title1"));
 		listUser.add(new User("2", "Aman", "Kumar", new Date(), "Title2"));
@@ -53,13 +60,22 @@ public class UserControllerTest {
 		
 		String url = "/getusers";
 		
-		MvcResult mvcResult = mockMvc.perform(get(url)).andExpect(status().isOk()).andReturn();
-		
+		MvcResult mvcResult = mockMvc.perform(get(url)).andExpect(status().isAccepted()).andReturn();
+
 		String actualJsonResponse = mvcResult.getResponse().getContentAsString();
+		JSONObject jsonObjectResponse = new JSONObject(actualJsonResponse);
+		String actual = jsonObjectResponse.getString("data");
 				
-		String exptectedJsonResponse = objectMapper.writeValueAsString(listUser);
+		String exptectedJsonResponse = objectMapper.writeValueAsString(new ResponseEntity<ResponseDefObject<List<User>>>(new ResponseDefObject<List<User>> 
+		(HttpStatus.CREATED.value(), Util.SUCCESS, listUser), HttpStatus.ACCEPTED));
 		
-		assertThat(actualJsonResponse).isEqualToIgnoringWhitespace(exptectedJsonResponse);
+		JSONObject jsonObject = new JSONObject(exptectedJsonResponse);
+		System.out.println(exptectedJsonResponse);
+		String getBody = jsonObject.getString("body");
+		JSONObject jsonObjectBody = new JSONObject(getBody);
+		String expected = jsonObjectBody.getString("data");
+		
+		assertThat(actual).isEqualToIgnoringWhitespace(expected);
 	}
 
 	@Test
@@ -75,7 +91,7 @@ public class UserControllerTest {
 				post(url)
 				.contentType("application/json")
 				.content(objectMapper.writeValueAsString(user))
-				).andExpect(status().isOk());
+				).andExpect(status().isAccepted());
 	}
 	
 	@Test
@@ -91,7 +107,7 @@ public class UserControllerTest {
 				post(url)
 				.contentType("application/json")
 				.content(objectMapper.writeValueAsString(existingUser))
-				).andExpect(status().isOk());
+				).andExpect(status().isAccepted());
 	}
 	
 	@Test
@@ -102,7 +118,7 @@ public class UserControllerTest {
 		
 		String url = "/deleteuser/" + id;
 		
-		mockMvc.perform(delete(url)).andExpect(status().isOk());
+		mockMvc.perform(delete(url)).andExpect(status().isAccepted());
 		
 		Mockito.verify(userService, times(1)).deleteUser(id);
 	}
