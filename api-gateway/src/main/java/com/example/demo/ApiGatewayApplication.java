@@ -6,8 +6,8 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 
 @SpringBootApplication
-@EnableEurekaClient
-@EnableZuulProxy
+@EnableEurekaClient	//	Registration of this micro service to eureka micro service
+@EnableZuulProxy	//	Making this micro service as api-gateway for other micro services
 public class ApiGatewayApplication {
 
 	public static void main(String[] args) {
