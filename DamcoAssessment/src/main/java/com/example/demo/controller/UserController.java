@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.exception.InvalidFieldException;
 import com.example.demo.model.ResponseDefObject;
 import com.example.demo.model.User;
 import com.example.demo.service.IUserService;
@@ -81,5 +82,10 @@ public class UserController {
 			return new ResponseEntity<ResponseDefObject<String>>(new ResponseDefObject<String> 
 			(HttpStatus.EXPECTATION_FAILED.value(), Util.ERROR, e.getMessage()), HttpStatus.EXPECTATION_FAILED);
 		}
+	}
+	
+	@GetMapping("/getMessage")
+	public void message() throws InvalidFieldException {
+		throw new InvalidFieldException();
 	}
 }

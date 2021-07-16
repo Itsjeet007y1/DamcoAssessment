@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.example.demo.model.ResponseDefObject;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.service.UserService;
+import com.example.demo.service.impl.UserService;
 import com.example.demo.utility.Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
