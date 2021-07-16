@@ -9,11 +9,14 @@ import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.IUserService;
 
-@Service
+/*
+ * user service interface's implementation class for CRUD operations
+ */
+@Service	// Generic annotation for service layer
 public class UserService implements IUserService {
-	
+
 	@Autowired
-	UserRepository userRepository;
+	UserRepository userRepository;	// Auto Injecting repository object in user service class
 
 	@Override
 	public User createUser(User user) {
@@ -31,4 +34,8 @@ public class UserService implements IUserService {
 		return "User with id: " + userId + " deleted successfully.";
 	}
 
+	@Override
+	public boolean isUserExist(String id) {
+		return userRepository.existsById(id);
+	}
 }

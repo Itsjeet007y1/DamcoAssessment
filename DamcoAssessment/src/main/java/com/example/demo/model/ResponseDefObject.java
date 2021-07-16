@@ -1,5 +1,8 @@
 package com.example.demo.model;
 
+/*
+ * Custom Response Object for user friendly response
+ */
 final public class ResponseDefObject<T> {
 	private int statusCode;
 	private String message;

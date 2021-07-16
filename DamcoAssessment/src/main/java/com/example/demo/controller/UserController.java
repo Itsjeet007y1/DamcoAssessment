@@ -14,78 +14,87 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.exception.InvalidFieldException;
+import com.example.demo.exception.DuplicateUserFoundException;
+import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.model.ResponseDefObject;
 import com.example.demo.model.User;
 import com.example.demo.service.IUserService;
 import com.example.demo.utility.Util;
 
-@RestController
+@RestController	// Annotation for Rest Controller, It is a combination of @ResponseBody, @Controller annotations and others
 public class UserController {
-	
+
+	//creation of logger variable for log generation
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
-	IUserService userService;
-	
+	IUserService userService; // Auto wiring user service object inside user controller
+
+	/*
+	 * Create user end point to save a user data into database if user does not exist
+	 */
 	@PostMapping("/saveuser")
 	public ResponseEntity<ResponseDefObject<User>> createUser(@RequestBody User user) {
-		try {
+		boolean isUserExist = userService.isUserExist(user.getUserId());
+		System.out.println("user:" + isUserExist);
+		if (!isUserExist) {
 			logger.info("saveuser end point is called.");
 			User savedUser = userService.createUser(user);
-			return new ResponseEntity<ResponseDefObject<User>>(new ResponseDefObject<User> 
-			(HttpStatus.CREATED.value(), Util.SUCCESS, savedUser), HttpStatus.ACCEPTED);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return new ResponseEntity<ResponseDefObject<User>>(new ResponseDefObject<User> 
-			(HttpStatus.EXPECTATION_FAILED.value(), Util.ERROR, e.getMessage()), HttpStatus.EXPECTATION_FAILED);
+			return new ResponseEntity<ResponseDefObject<User>>(
+					new ResponseDefObject<User>(HttpStatus.CREATED.value(), Util.SUCCESS, savedUser),
+					HttpStatus.ACCEPTED);
+		} else {
+			logger.warn("User already exist with the givent userId.");
+			throw new DuplicateUserFoundException();
 		}
 	}
-	
+
+	/*
+	 * update user end point to update the user data if user exist
+	 */
 	@PostMapping("/updateuser")
 	public ResponseEntity<ResponseDefObject<User>> updateUser(@RequestBody User user) {
-		try {
+		boolean isUserExist = userService.isUserExist(user.getUserId());
+		System.out.println("user:" + isUserExist);
+		if (isUserExist) {
 			logger.info("updateuser end point is called.");
 			User savedUser = userService.createUser(user);
-			return new ResponseEntity<ResponseDefObject<User>>(new ResponseDefObject<User> 
-			(HttpStatus.CREATED.value(), Util.SUCCESS, savedUser), HttpStatus.ACCEPTED);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return new ResponseEntity<ResponseDefObject<User>>(new ResponseDefObject<User> 
-			(HttpStatus.EXPECTATION_FAILED.value(), Util.ERROR, e.getMessage()), HttpStatus.EXPECTATION_FAILED);
+			return new ResponseEntity<ResponseDefObject<User>>(
+					new ResponseDefObject<User>(HttpStatus.CREATED.value(), Util.SUCCESS, savedUser),
+					HttpStatus.ACCEPTED);
+		} else {
+			logger.warn("User with given id does not exist.");
+			throw new UserNotFoundException();
 		}
 	}
-	
+
+	/*
+	 * get all the users
+	 */
 	@GetMapping("/getusers")
 	public ResponseEntity<ResponseDefObject<List<User>>> getUsers() {
-		try {
-			logger.info("getusers end point is called.");
-			List<User> savedUsersList = userService.readUser();
-			return new ResponseEntity<ResponseDefObject<List<User>>>(new ResponseDefObject<List<User>> 
-			(HttpStatus.CREATED.value(), Util.SUCCESS, savedUsersList), HttpStatus.ACCEPTED);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return new ResponseEntity<ResponseDefObject<List<User>>>(new ResponseDefObject<List<User>> 
-			(HttpStatus.EXPECTATION_FAILED.value(), Util.ERROR, e.getMessage()), HttpStatus.EXPECTATION_FAILED);
-		}
+		logger.info("getusers end point is called.");
+		List<User> savedUsersList = userService.readUser();
+		return new ResponseEntity<ResponseDefObject<List<User>>>(
+				new ResponseDefObject<List<User>>(HttpStatus.CREATED.value(), Util.SUCCESS, savedUsersList),
+				HttpStatus.ACCEPTED);
 	}
-	
+
+	/*
+	 * deleting the user in database if user exist
+	 */
 	@DeleteMapping("/deleteuser/{id}")
 	public ResponseEntity<ResponseDefObject<String>> deleteUser(@PathVariable("id") String id) {
-		try {
+		boolean isUserExist = userService.isUserExist(id);
+		if (isUserExist) {
 			logger.info("deleteuser end point is called.");
 			String str = userService.deleteUser(id);
-			return new ResponseEntity<ResponseDefObject<String>>(new ResponseDefObject<String> 
-			(HttpStatus.CREATED.value(), Util.SUCCESS, str), HttpStatus.ACCEPTED);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return new ResponseEntity<ResponseDefObject<String>>(new ResponseDefObject<String> 
-			(HttpStatus.EXPECTATION_FAILED.value(), Util.ERROR, e.getMessage()), HttpStatus.EXPECTATION_FAILED);
+			return new ResponseEntity<ResponseDefObject<String>>(
+					new ResponseDefObject<String>(HttpStatus.CREATED.value(), Util.SUCCESS, str), HttpStatus.ACCEPTED);
+		} else {
+			logger.warn("User already exist with the given userId.");
+			throw new UserNotFoundException();
 		}
 	}
-	
-	@GetMapping("/getMessage")
-	public void message() throws InvalidFieldException {
-		throw new InvalidFieldException();
-	}
+
 }
